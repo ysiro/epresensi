@@ -21,7 +21,7 @@
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation (Desktop) -->
     <nav class="sidebar glass-panel">
         <div class="logo-area">
             <i data-lucide="layers"></i>
@@ -36,10 +36,10 @@
             <li onclick="navigate('admin')"><i data-lucide="settings"></i> Admin</li>
         </ul>
 
-        <!-- Theme Toggle -->
+        <!-- Theme Toggle (Desktop Only) -->
         <div class="theme-toggle" onclick="toggleTheme()">
-            <span id="theme-label">Dark Mode</span>
-            <i data-lucide="moon" id="theme-icon"></i>
+            <span id="theme-label-desktop">Dark Mode</span>
+            <i data-lucide="moon" id="theme-icon-desktop"></i>
         </div>
     </nav>
 
@@ -95,17 +95,17 @@
                         <option value="dinas">Dinas Luar</option>
                     </select>
 
-                    <!-- Field Non-Presensi (Izin/Sakit/dll) -->
+                    <!-- Field Non-Presensi -->
                     <div id="non-presensi-fields" style="display:none;">
                         <textarea placeholder="Jelaskan alasan..." rows="3"></textarea>
                         <button class="btn-primary" onclick="alert('Laporan non-presensi terkirim!')">Kirim Laporan</button>
                     </div>
 
-                    <!-- Field Presensi (Hadri/Pulang) -->
+                    <!-- Field Presensi -->
                     <div id="presensi-fields">
                         <div class="camera-controls">
-                            <button onclick="startCamera('user')"><i data-lucide="smile"></i> Selfie</button>
-                            <button onclick="startCamera('environment')"><i data-lucide="briefcase"></i> Foto Kerja</button>
+                            <button type="button" onclick="startCamera('user')"><i data-lucide="smile"></i> Selfie</button>
+                            <button type="button" onclick="startCamera('environment')"><i data-lucide="briefcase"></i> Foto Kerja</button>
                         </div>
                         
                         <div class="preview-area">
@@ -118,7 +118,7 @@
                             <label>Catatan Kegiatan</label>
                             <div class="voice-input-wrapper">
                                 <input type="text" id="activity-note" placeholder="Ketik atau tekan mikrofon...">
-                                <button id="mic-btn" onclick="toggleSpeech()"><i data-lucide="mic"></i></button>
+                                <button type="button" id="mic-btn" onclick="toggleSpeech()"><i data-lucide="mic"></i></button>
                             </div>
                         </div>
 
@@ -175,6 +175,30 @@
         </section>
 
     </main>
+
+    <!-- BOTTOM NAVIGATION (Mobile Only) -->
+    <nav class="bottom-nav glass-panel">
+        <div class="nav-item active" onclick="navigate('dashboard')">
+            <i data-lucide="home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="navigate('presensi')">
+            <i data-lucide="fingerprint"></i>
+            <span>Absen</span>
+        </div>
+        <div class="nav-item" onclick="navigate('raport')">
+            <i data-lucide="bar-chart-2"></i>
+            <span>Raport</span>
+        </div>
+        <div class="nav-item" onclick="navigate('maps')">
+            <i data-lucide="map"></i>
+            <span>Peta</span>
+        </div>
+        <div class="nav-item" onclick="toggleTheme()">
+            <i data-lucide="moon" id="theme-icon-mobile"></i>
+            <span>Tema</span>
+        </div>
+    </nav>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
