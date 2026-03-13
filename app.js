@@ -1,29 +1,58 @@
+// --- GLOBAL FUNCTIONS EXPOSURE ---
+// Memastikan fungsi bisa diakses dari HTML onclick
+window.navigate = navigate;
+window.toggleTheme = toggleTheme;
+window.startCamera = startCamera;
+window.toggleSpeech = toggleSpeech;
+window.toggleAbsenFields = toggleAbsenFields;
+
 // --- NAVIGASI ---
 function navigate(pageId) {
     // Sembunyikan semua section
     document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
-    document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-
+    
     // Tampilkan section target
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
 
-    // Highlight menu (Simple logic for demo)
-    // In real app, match by ID or data attribute
-    
-    // Re-render icons
-    lucide.createIcons();
+    // Update Active State pada Sidebar (Desktop)
+    document.querySelectorAll('.sidebar .nav-links li').forEach(li => {
+        li.classList.remove('active');
+        // Simple check based on onclick attribute content
+        if(li.getAttribute('onclick').includes(pageId)) {
+            li.classList.add('active');
+        }
+    });
 
-    // Jika masuk ke maps, resize peta (fix bug leaflet di hidden div)
+    // Update Active State pada Bottom Nav (Mobile)
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+        item.classList.remove('active');
+        if(item.getAttribute('onclick').includes(pageId)) {
+            item.classList.add('active');
+        }
+        // Khusus tombol tema
+        if(item.getAttribute('onclick').includes('toggleTheme')) {
+            item.classList.remove('active');
+        }
+    });
+
+    // Re-render icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Jika masuk ke maps, resize peta
     if(pageId === 'maps' && map) {
         setTimeout(() => { map.invalidateSize(); }, 200);
     }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
 }
 
 // --- JAM SERVER & GREETING ---
 function updateClock() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('id-ID', { hour12: false });
     
     // Dynamic Greeting
     const hour = now.getHours();
@@ -32,9 +61,10 @@ function updateClock() {
     else if(hour >= 11 && hour < 15) greeting = "Selamat Siang";
     else if(hour >= 15 && hour < 18) greeting = "Selamat Sore";
     
-    document.getElementById('greeting').innerText = `${greeting}, Pegawai!`;
+    const greetingEl = document.getElementById('greeting');
+    if(greetingEl) greetingEl.innerText = `${greeting}, Pegawai!`;
     
-    checkWorkRules(now); // Cek aturan kerja setiap detik
+    checkWorkRules(now);
 }
 
 setInterval(updateClock, 1000);
@@ -43,23 +73,31 @@ setInterval(updateClock, 1000);
 function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.getAttribute('data-theme');
-    const label = document.getElementById('theme-label');
-    const icon = document.getElementById('theme-icon');
+    
+    // Elements Desktop
+    const labelDesktop = document.getElementById('theme-label-desktop');
+    const iconDesktop = document.getElementById('theme-icon-desktop');
+    
+    // Elements Mobile
+    const iconMobile = document.getElementById('theme-icon-mobile');
     
     if (currentTheme === 'light') {
         html.setAttribute('data-theme', 'dark');
-        label.innerText = 'Dark Mode';
-        icon.setAttribute('data-lucide', 'moon');
-        // Update map tiles if needed
+        if(labelDesktop) labelDesktop.innerText = 'Dark Mode';
+        if(iconDesktop) iconDesktop.setAttribute('data-lucide', 'moon');
+        if(iconMobile) iconMobile.setAttribute('data-lucide', 'moon');
         if(map) updateMapTiles('dark');
     } else {
         html.setAttribute('data-theme', 'light');
-        label.innerText = 'Light Mode';
-        icon.setAttribute('data-lucide', 'sun');
-        // Update map tiles if needed
+        if(labelDesktop) labelDesktop.innerText = 'Light Mode';
+        if(iconDesktop) iconDesktop.setAttribute('data-lucide', 'sun');
+        if(iconMobile) iconMobile.setAttribute('data-lucide', 'sun');
         if(map) updateMapTiles('light');
     }
-    lucide.createIcons();
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 // --- LOGIKA E-PRESENSI ---
@@ -75,11 +113,11 @@ function toggleAbsenFields() {
     if (['hadir'].includes(type)) {
         presensiDiv.style.display = 'block';
         nonPresensiDiv.style.display = 'none';
-        btnSubmit.style.display = 'block';
+        if(btnSubmit) btnSubmit.style.display = 'block';
     } else {
         presensiDiv.style.display = 'none';
         nonPresensiDiv.style.display = 'block';
-        btnSubmit.style.display = 'none';
+        if(btnSubmit) btnSubmit.style.display = 'none';
     }
 }
 
@@ -87,8 +125,9 @@ function checkWorkRules(now) {
     const currentTime = now.toTimeString().substring(0, 5); // HH:MM
     const infoBox = document.getElementById('work-rule-info');
     const submitBtn = document.getElementById('btn-submit-presensi');
+    
+    if(!infoBox || !submitBtn) return;
 
-    // Logika Sederhana untuk Demo
     if (currentTime <= "07:40") {
         infoBox.innerHTML = `<span style="color:#10b981">Waktu Ideal (Skor 50)</span>`;
         submitBtn.disabled = false;
@@ -108,11 +147,11 @@ function checkWorkRules(now) {
     }
 }
 
-// --- KAMERA & WATERMARKING ---
+// --- KAMERA ---
 async function startCamera(facingMode) {
     const video = document.getElementById('camera-feed');
-    const canvas = document.getElementById('camera-canvas');
-    
+    if(!video) return;
+
     try {
         if(videoStream) videoStream.getTracks().forEach(track => track.stop());
         
@@ -121,9 +160,6 @@ async function startCamera(facingMode) {
         });
         video.srcObject = videoStream;
         window.currentStream = videoStream;
-        
-        // Auto capture after 2 seconds for demo purposes (optional)
-        // setTimeout(capturePhoto, 2000); 
     } catch (err) {
         alert("Gagal mengakses kamera: " + err.message);
     }
@@ -132,8 +168,9 @@ async function startCamera(facingMode) {
 function capturePhoto() {
     const video = document.getElementById('camera-feed');
     const canvas = document.getElementById('camera-canvas');
-    const ctx = canvas.getContext('2d');
+    if(!video || !canvas) return;
 
+    const ctx = canvas.getContext('2d');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -153,31 +190,34 @@ function capturePhoto() {
     capturedPhotoData = canvas.toDataURL('image/jpeg');
     
     const imgPreview = document.getElementById('photo-preview');
-    imgPreview.src = capturedPhotoData;
-    imgPreview.style.display = 'block';
-    video.style.display = 'none';
+    if(imgPreview) {
+        imgPreview.src = capturedPhotoData;
+        imgPreview.style.display = 'block';
+        video.style.display = 'none';
+    }
     
     if(window.currentStream) window.currentStream.getTracks().forEach(track => track.stop());
     
-    // Enable submit button visually (logic handled in submit click)
-    document.getElementById('btn-submit-presensi').disabled = false;
+    const btn = document.getElementById('btn-submit-presensi');
+    if(btn) btn.disabled = false;
 }
 
-// Override submit button to trigger capture first
+// Submit Handler
 document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('btn-submit-presensi');
-    submitBtn.onclick = function() {
-        if(!capturedPhotoData) {
-            // Simulate auto capture if user didn't click camera button explicitly
-            if(window.currentStream) {
-                capturePhoto();
-            } else {
-                alert("Silakan aktifkan kamera terlebih dahulu!");
-                return;
+    if(submitBtn) {
+        submitBtn.onclick = function() {
+            if(!capturedPhotoData) {
+                if(window.currentStream) {
+                    capturePhoto();
+                } else {
+                    alert("Silakan aktifkan kamera terlebih dahulu!");
+                    return;
+                }
             }
-        }
-        processSubmission();
-    };
+            processSubmission();
+        };
+    }
 });
 
 // --- SPEECH TO TEXT ---
@@ -195,11 +235,11 @@ function toggleSpeech() {
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    recognition.onstart = function() { micBtn.classList.add('listening'); };
-    recognition.onend = function() { micBtn.classList.remove('listening'); };
+    recognition.onstart = function() { if(micBtn) micBtn.classList.add('listening'); };
+    recognition.onend = function() { if(micBtn) micBtn.classList.remove('listening'); };
     recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
-        inputField.value += (inputField.value ? " " : "") + transcript;
+        if(inputField) inputField.value += (inputField.value ? " " : "") + transcript;
     };
 
     recognition.start();
@@ -208,23 +248,28 @@ function toggleSpeech() {
 // --- ANTRIAN SUBMISSION ---
 function processSubmission() {
     const queueIndicator = document.getElementById('queue-indicator');
-    queueIndicator.style.display = 'flex';
+    if(queueIndicator) queueIndicator.style.display = 'flex';
     
     console.log("Masuk Antrian Lokal...", {
         photo: capturedPhotoData ? "Ada" : "Tidak Ada",
-        note: document.getElementById('activity-note').value,
-        gps: "Lat: -6.20, Long: 106.82" // Mockup
+        note: document.getElementById('activity-note')?.value,
+        gps: "Lat: -6.20, Long: 106.82"
     });
 
     setTimeout(() => {
-        queueIndicator.innerHTML = `<i data-lucide="check-circle" style="color:green"></i> Terkirim ke Server!`;
-        lucide.createIcons();
+        if(queueIndicator) {
+            queueIndicator.innerHTML = `<i data-lucide="check-circle" style="color:green"></i> Terkirim ke Server!`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
         setTimeout(() => {
-            queueIndicator.style.display = 'none';
+            if(queueIndicator) queueIndicator.style.display = 'none';
             capturedPhotoData = null;
-            document.getElementById('photo-preview').style.display = 'none';
-            document.getElementById('camera-feed').style.display = 'block';
-            document.getElementById('activity-note').value = '';
+            const imgPreview = document.getElementById('photo-preview');
+            const videoFeed = document.getElementById('camera-feed');
+            if(imgPreview) imgPreview.style.display = 'none';
+            if(videoFeed) videoFeed.style.display = 'block';
+            const noteField = document.getElementById('activity-note');
+            if(noteField) noteField.value = '';
             alert("Absensi Berhasil!");
         }, 2000);
     }, 3000);
@@ -233,9 +278,10 @@ function processSubmission() {
 // --- MAPS INITIALIZATION ---
 let map;
 function initMap() {
-    if(document.getElementById('map-container')) {
+    const mapContainer = document.getElementById('map-container');
+    if(mapContainer) {
         map = L.map('map-container').setView([-6.2088, 106.8456], 13);
-        updateMapTiles('dark'); // Default dark
+        updateMapTiles('dark');
         
         L.marker([-6.2088, 106.8456]).addTo(map)
             .bindPopup('<b>Budi Santoso</b><br>Terakhir: Baru saja')
@@ -246,7 +292,6 @@ function initMap() {
 function updateMapTiles(theme) {
     if(!map) return;
     
-    // Clear existing layers
     map.eachLayer((layer) => {
         if(layer instanceof L.TileLayer) map.removeLayer(layer);
     });
@@ -261,9 +306,11 @@ function updateMapTiles(theme) {
     }).addTo(map);
 }
 
-// Start
+// Start Application
 document.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
     initMap();
     updateClock();
 });
