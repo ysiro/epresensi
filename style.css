@@ -194,7 +194,7 @@ button {
 .rules-list li { padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; display: flex; justify-content: space-between; }
 .rules-list .time { font-family: monospace; font-weight: bold; color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); padding: 2px 6px; border-radius: 4px; }
 
-/* --- RESPONSIVE MOBILE (< 400px) --- */
+/* --- RESPONSIVE MOBILE (< 768px) --- */
 @media (max-width: 768px) {
     body { flex-direction: column; }
     .sidebar {
@@ -204,8 +204,8 @@ button {
         border-radius: 0;
     }
     .logo-area { margin-bottom: 0; font-size: 1.2rem; }
-    .nav-links { display: none; } /* Hide menu on mobile for simplicity in this demo */
-    .theme-toggle { display: none; } /* Move theme toggle to header or settings in real app */
+    .nav-links { display: none; } 
+    .theme-toggle { display: none; } 
     .main-content { margin-left: 0; padding: 1rem; }
     .hero { flex-direction: column-reverse; text-align: center; gap: 15px; padding: 1.5rem; }
     .hero-text h1 { font-size: 1.5rem; }
@@ -215,7 +215,6 @@ button {
 
 /* --- ULTRA SMALL MOBILE (< 400px) --- */
 @media (max-width: 400px) {
-    /* Margin kanan kiri sangat tipis (0.5rem) agar luas */
     .main-content {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
