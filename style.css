@@ -1,0 +1,128 @@
+:root {
+    --bg-dark: #0f172a;
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --royal-blue: #3b82f6;
+    --vibrant-orange: #f97316;
+    --success: #22c55e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.15) 0%, transparent 20%);
+    color: var(--text-main);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Utility */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    padding: 2rem;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 3rem; color: var(--royal-blue); }
+.nav-links { list-style: none; flex: 1; }
+.nav-links li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+}
+.nav-links li:hover, .nav-links li.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--royal-blue);
+}
+.server-status { margin-top: auto; font-size: 0.8rem; color: var(--text-muted); }
+.dot { height: 8px; width: 8px; background: var(--success); border-radius: 50%; display: inline-block; }
+
+/* Main Content */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 1400px;
+}
+
+.page-section { display: none; animation: fadeIn 0.5s ease; }
+.page-section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Hero Section */
+.hero { display: flex; justify-content: space-between; align-items: center; padding: 2rem; margin-bottom: 2rem; }
+.hero-img img { width: 150px; border-radius: 50%; border: 3px solid var(--royal-blue); }
+.badge-success { background: rgba(34, 197, 94, 0.2); color: var(--success); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; }
+
+/* Grid Services */
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+.card { padding: 1.5rem; text-align: center; cursor: pointer; transition: 0.3s; }
+.card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
+.icon-blue { color: var(--royal-blue); margin-bottom: 1rem; }
+.icon-orange { color: var(--vibrant-orange); margin-bottom: 1rem; }
+
+/* Forms & Inputs */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--glass-border);
+    color: white;
+    border-radius: 8px;
+}
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+.btn-primary { background: var(--royal-blue); color: white; }
+.btn-primary:disabled { background: gray; cursor: not-allowed; }
+.btn-secondary { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+/* Camera Preview */
+#camera-feed, #photo-preview { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; background: #000; }
+.camera-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+.voice-input-wrapper { display: flex; gap: 5px; }
+#mic-btn.listening { color: red; animation: pulse 1s infinite; }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* Responsive */
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: relative; padding: 1rem; flex-direction: row; align-items: center; justify-content: space-between; }
+    .nav-links { display: none; } /* Simplified for demo */
+    .main-content { margin-left: 0; padding: 1rem; }
+    .hero { flex-direction: column-reverse; text-align: center; }
+}
