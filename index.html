@@ -10,10 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
+    <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Leaflet CSS -->
+    
+    <!-- Leaflet CSS (Maps) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -49,10 +51,10 @@
             <div class="hero glass-panel">
                 <div class="hero-text">
                     <h1 id="greeting">Selamat Datang!</h1>
-                    <p>Status: <span class="badge-success">Online</span></p>
+                    <p>Status Sistem: <span class="badge-success">Online / Official</span></p>
                 </div>
                 <div class="hero-img">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200" alt="User">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200" alt="User Profile">
                 </div>
             </div>
 
@@ -60,17 +62,17 @@
                 <div class="card glass-panel" onclick="navigate('presensi')">
                     <i data-lucide="scan-face" class="icon-blue"></i>
                     <h3>E-Presensi</h3>
-                    <p>Absen Masuk/Pulang</p>
+                    <p>Absen Masuk & Pulang</p>
                 </div>
                 <div class="card glass-panel" onclick="navigate('raport')">
                     <i data-lucide="file-check" class="icon-orange"></i>
                     <h3>E-Raport</h3>
-                    <p>Lihat Kinerja</p>
+                    <p>Evaluasi Kinerja</p>
                 </div>
                 <div class="card glass-panel" onclick="navigate('maps')">
                     <i data-lucide="navigation" class="icon-blue"></i>
                     <h3>Live Maps</h3>
-                    <p>Sebaran Lokasi</p>
+                    <p>Sebaran Pegawai</p>
                 </div>
             </div>
         </section>
@@ -80,6 +82,7 @@
             <h2><i data-lucide="fingerprint"></i> Input Kehadiran</h2>
             
             <div class="presensi-container">
+                <!-- Form Input -->
                 <div class="form-box glass-panel" style="padding: 1.5rem;">
                     <div class="status-badge" id="work-rule-info">Memuat Waktu...</div>
                     
@@ -89,17 +92,20 @@
                         <option value="izin">Izin</option>
                         <option value="sakit">Sakit</option>
                         <option value="cuti">Cuti</option>
+                        <option value="dinas">Dinas Luar</option>
                     </select>
 
+                    <!-- Field Non-Presensi (Izin/Sakit/dll) -->
                     <div id="non-presensi-fields" style="display:none;">
-                        <textarea placeholder="Alasan..." rows="3"></textarea>
-                        <button class="btn-primary" onclick="alert('Laporan terkirim!')">Kirim Laporan</button>
+                        <textarea placeholder="Jelaskan alasan..." rows="3"></textarea>
+                        <button class="btn-primary" onclick="alert('Laporan non-presensi terkirim!')">Kirim Laporan</button>
                     </div>
 
+                    <!-- Field Presensi (Hadri/Pulang) -->
                     <div id="presensi-fields">
                         <div class="camera-controls">
                             <button onclick="startCamera('user')"><i data-lucide="smile"></i> Selfie</button>
-                            <button onclick="startCamera('environment')"><i data-lucide="briefcase"></i> Kerja</button>
+                            <button onclick="startCamera('environment')"><i data-lucide="briefcase"></i> Foto Kerja</button>
                         </div>
                         
                         <div class="preview-area">
@@ -109,9 +115,9 @@
                         </div>
 
                         <div style="margin-top: 1rem;">
-                            <label>Catatan</label>
+                            <label>Catatan Kegiatan</label>
                             <div class="voice-input-wrapper">
-                                <input type="text" id="activity-note" placeholder="Ketik atau bicara...">
+                                <input type="text" id="activity-note" placeholder="Ketik atau tekan mikrofon...">
                                 <button id="mic-btn" onclick="toggleSpeech()"><i data-lucide="mic"></i></button>
                             </div>
                         </div>
@@ -120,31 +126,58 @@
                     </div>
                 </div>
 
+                <!-- Info Panel -->
                 <div class="info-box glass-panel" style="padding: 1.5rem;">
-                    <h3 style="font-size:1rem; margin-bottom:1rem;">Aturan Skor</h3>
+                    <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-primary);">Aturan Skor</h3>
                     <ul class="rules-list">
-                        <li><span class="time">≤ 07.40</span> <span>Skor 50</span></li>
-                        <li><span class="time">07.41-08.00</span> <span>Skor 40</span></li>
-                        <li><span class="time">> 08.00</span> <span>Skor 25</span></li>
-                        <li><span class="time">≥ 10.00</span> <span>Pulang (+50)</span></li>
+                        <li><span class="time">≤ 07.40</span> <span>Skor 50 (Penuh)</span></li>
+                        <li><span class="time">07.41-08.00</span> <span>Skor 40 (Telat Ringan)</span></li>
+                        <li><span class="time">> 08.00</span> <span>Skor 25 (Telat Signifikan)</span></li>
+                        <li><span class="time">≥ 10.00</span> <span>Pulang (+50 Bonus)</span></li>
                     </ul>
-                    <div id="queue-indicator" style="margin-top:1rem; font-size:0.8rem; color:var(--accent-blue); display:none;">
-                        <i data-lucide="loader" style="width:14px; height:14px; display:inline-block; animation:spin 1s linear infinite;"></i> Mengirim data...
+                    <div id="queue-indicator" style="margin-top:1rem; font-size:0.8rem; color:var(--accent-blue); display:none; align-items:center; gap:5px;">
+                        <i data-lucide="loader" style="width:14px; height:14px;"></i> Data masuk antrian lokal...
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Placeholder Sections -->
-        <section id="raport" class="page-section"><h2>E-Raport</h2><div class="glass-panel" style="padding:2rem; text-align:center;">Grafik kinerja akan muncul di sini.</div></section>
-        <section id="maps" class="page-section"><h2>Peta Sebaran</h2><div id="map-container" class="glass-panel" style="height:400px; border-radius:12px;"></div></section>
-        <section id="admin" class="page-section"><h2>Admin Panel</h2><div class="glass-panel" style="padding:2rem;">Area manajemen pegawai.</div></section>
+        <!-- SECTION 3: E-RAPORT -->
+        <section id="raport" class="page-section">
+            <h2><i data-lucide="bar-chart-2"></i> Evaluasi Kinerja</h2>
+            <div class="filters glass-panel" style="padding: 1rem; margin-bottom: 1rem; display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="date" style="margin:0; flex:1;">
+                <input type="date" style="margin:0; flex:1;">
+                <button class="btn-secondary">Filter</button>
+            </div>
+            <div class="glass-panel" style="padding: 2rem; text-align: center; min-height: 200px; display:flex; align-items:center; justify-content:center;">
+                <div>
+                    <i data-lucide="bar-chart" style="width:48px; height:48px; color:var(--text-muted); margin-bottom:1rem;"></i>
+                    <p style="color:var(--text-secondary);">Grafik Heatmap & Statistik akan muncul di sini.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MAPS -->
+        <section id="maps" class="page-section">
+            <h2><i data-lucide="map"></i> Sebaran Wilayah</h2>
+            <div id="map-container" class="glass-panel" style="height: 500px; border-radius: 12px; z-index: 1;"></div>
+        </section>
+
+        <!-- SECTION 5: ADMIN -->
+        <section id="admin" class="page-section">
+            <h2><i data-lucide="settings"></i> Admin Panel</h2>
+            <div class="glass-panel" style="padding: 2rem; text-align: center;">
+                <i data-lucide="lock" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Area ini dilindungi password.</p>
+                <button class="btn-primary">Login Administrator</button>
+            </div>
+        </section>
 
     </main>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
-    <script src="presensi.js"></script>
 </body>
 </html>
