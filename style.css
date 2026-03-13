@@ -245,3 +245,60 @@ button {
     
     .glass-panel { border-radius: 12px; }
 }
+/* --- BOTTOM NAVIGATION (MOBILE ONLY) --- */
+.bottom-nav {
+    display: none; /* Hidden on desktop */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-color);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom); /* Support iPhone X+ */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    gap: 4px;
+    width: 20%;
+    height: 100%;
+}
+
+.nav-item i {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2px;
+}
+
+.nav-item.active {
+    color: var(--accent-blue);
+}
+
+.nav-item.active i {
+    fill: rgba(59, 130, 246, 0.2);
+}
+
+/* Show Bottom Nav only on mobile */
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: flex;
+    }
+    
+    /* Adjust main content padding so it doesn't hide behind bottom nav */
+    .main-content {
+        padding-bottom: 80px; 
+    }
+}
