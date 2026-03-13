@@ -62,3 +62,56 @@ document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     initMap();
 });
+// ... kode navigasi dan jam yang lama tetap ada ...
+
+// --- THEME TOGGLE LOGIC ---
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const label = document.getElementById('theme-label');
+    const icon = document.getElementById('theme-icon');
+    
+    if (currentTheme === 'light') {
+        html.setAttribute('data-theme', 'dark');
+        label.innerText = 'Dark Mode';
+        icon.setAttribute('data-lucide', 'moon');
+    } else {
+        html.setAttribute('data-theme', 'light');
+        label.innerText = 'Light Mode';
+        icon.setAttribute('data-lucide', 'sun');
+    }
+    lucide.createIcons(); // Refresh icons
+}
+
+// Initialize Map (Pastikan map di-render ulang saat tab aktif jika perlu)
+let map;
+function initMap() {
+    if(document.getElementById('map-container')) {
+        map = L.map('map-container').setView([-6.2088, 106.8456], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/{style}/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap',
+            subdomains: 'abcd',
+            maxZoom: 19,
+            style: document.documentElement.getAttribute('data-theme') === 'light' ? 'light_all' : 'dark_all'
+        }).addTo(map);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    initMap();
+    updateClock(); // Pastikan jam jalan
+});
+
+// Update map tiles when theme changes (Optional enhancement)
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+            if(map) {
+                // Reload map tiles with new style logic if needed
+                // For simple implementation, user might need to refresh map tab
+            }
+        }
+    });
+});
+observer.observe(document.documentElement, { attributes: true });
